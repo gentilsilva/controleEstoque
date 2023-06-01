@@ -119,7 +119,7 @@ public class Computador {
 			modelo = Main.leia.nextLine();	    	
 			System.out.print("Digite o processador do computador.............: ");
 			processador = Main.leia.nextLine();
-			System.out.print("Digite a quantidade de mem�ria do computador...: ");
+			System.out.print("Digite a quantidade de mem�ria do computador...: ");
 			quantMemoria = Main.leia.nextInt();
 			System.out.print("Digite o tamanho da tela.......................: ");
 			tamanhoTela = Main.leia.nextInt();
@@ -133,7 +133,7 @@ public class Computador {
 			do {
 				System.out.print("\nConfirma a gravacao dos dados (S/N) ? ");
 				confirmacao = Main.leia.next().charAt(0);
-				if (confirmacao == 'S') {
+				if (confirmacao == 'S' || confirmacao == 's') {
 					gravarComputador();
 				}
 			}while (confirmacao != 'S' && confirmacao != 'N');
@@ -152,7 +152,7 @@ public class Computador {
 		do {
 			do {
 				Main.leia.nextLine();
-				System.out.println("\n ***************  ALTERACAO DE ALUNOS  ***************** ");
+				System.out.println("\n ***************  ALTERACAO DE Computadores  ***************** ");
 				System.out.print("Digite a Matricula do Computador que deseja alterar( FIM para encerrar ): ");
 				codigoComputador = Main.leia.nextLine();
 				if (codigoComputador.equals("FIM")) {
@@ -241,7 +241,7 @@ public class Computador {
 		do {
 			do {
 				Main.leia.nextLine();
-				System.out.println(" ***************  EXCLUSAO DE ALUNOS  ***************** ");
+				System.out.println(" ***************  EXCLUSAO DE COMPUTADORES  ***************** ");
 				System.out.print("Digite a Matricula do Computador que deseja excluir ( FIM para encerrar ): ");
 				codigoComputador = Main.leia.nextLine();
 				if (codigoComputador.equals("FIM")) {
@@ -269,7 +269,7 @@ public class Computador {
 			System.out.println();
 
 			do {
-				System.out.print("\nConfirma a exclusao deste aluno (S/N) ? ");
+				System.out.print("\nConfirma a exclusao deste PC? (S/N) ? ");
 				confirmacao = Main.leia.next().charAt(0);
 				if (confirmacao == 'S') {
 					desativarComputador(posicaoRegistro);
@@ -278,7 +278,55 @@ public class Computador {
 
 		}while ( ! codComp.equals("FIM"));
 	}
+	
+	//************************  REGISTRAR VENDAS  *********************
+	
+	public void registrarVenda() {
+		//Não estava parando na parte da matricula, tive que adicionar esse nextLine() para corrigir esse bug
+		Main.leia.nextLine();
+		
+		String codigo;
+		long posicao = 0;
+		String dataVenda = "---";
+		int vendido;
+		
+		
+		do {
+			System.out.print("Digite a Matricula do Computador( FIM para encerrar): ");
+			codigo = Main.leia.nextLine();
+			if (codigo.equals("FIM")) {
+				break;
+			}
+			posicao = localizarComputador(codigo);
+			
+			if (posicao == -1) {
+				System.out.println("Matricula Não Cadastrada, digite Um Valor válido! \n");
+			}
+		} while(posicao == -1);
+		
+		System.out.print("Qual a quantidade vendida? ");
+		vendido = Main.leia.nextInt();
+		
+		Main.leia.nextLine();
+		
+		System.out.print("Qual a data da Venda? ");
+		dataVenda = Main.leia.nextLine();
+		
+		desativarComputador(posicao);
+		
+		//ainda precisamos validar essas quantidades e datas
+		quantVendida += vendido;
+		quantEstoque -= quantVendida;
+		dtUltimaVenda = (String) dataVenda;
+		
+		gravarComputador();
+		
+		if(quantEstoque <=0) {
+			desativarComputador(localizarComputador(codigo));
+		}
+	}
 
+	
 	//************************  CONSULTA  *****************************
 	public void consultar() 	{
 		RandomAccessFile arqComp;
@@ -288,7 +336,7 @@ public class Computador {
 
 		do {
 			do {
-				System.out.println(" ***************  CONSULTA DE ALUNOS  ***************** ");
+				System.out.println(" ***************  CONSULTA DE COMPUTADORES  ***************** ");
 				System.out.println(" [1] CONSULTAR APENAS 1 COMPUTADOR ");
 				System.out.println(" [2] LISTA DE TODOS OS COMPUTADORES ");
 				System.out.println(" [3] LISTA DE TODOS OS COMPUTADORES VENDIDOS");
@@ -307,11 +355,11 @@ public class Computador {
 
 			case 1:  // consulta de uma unica matricula
 				Main.leia.nextLine();  // limpa buffer de memoria
-				System.out.print("Digite a Matriocula do Computador: ");
+				System.out.print("Digite a Matricula do Computador: ");
 				codigoComputador = Main.leia.nextLine();
 
 				posicaoRegistro = localizarComputador(codigoComputador);
-				if (posicaoRegistro >= 0) {
+				if (posicaoRegistro == -1) {
 					System.out.println("Matricula nao cadastrada no arquivo \n");
 				} else {
 					imprimirCabecalho();
@@ -353,7 +401,8 @@ public class Computador {
 				}
 				break;
 
-			case 3:  // imprime alunos do sexo desejado
+			case 3:  
+				// imprime alunos do sexo desejado
 //				do {
 //					System.out.print("Digite o Sexo desejado (M/F): ");
 //					sexoAux = Main.leia.next().charAt(0);
