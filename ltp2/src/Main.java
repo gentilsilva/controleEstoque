@@ -36,7 +36,7 @@ public class Main {
 					computador.excluir();
 					break;
 				case 4: 
-					//computador.registrarVenda();
+					computador.registrarVenda();
 					break;
 				case 5: 
 					computador.consultar();
