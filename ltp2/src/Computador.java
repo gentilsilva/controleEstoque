@@ -13,9 +13,13 @@ public class Computador {
 	float 	preco;
 	int 	quantVendida;
 	String 	dtUltimaVenda;
+
+	static String[] marcas =  {"Dell", "Lenovo", "HP", "Positivo", "Asus", "Apple", "IBM"};
+	static String[] processadores = {"Intel Core i3", "Intel Core i5", "Intel Core i7", "Intel Core i9", "AMD Ryzen", "AMD Athlon"};
+	static int[] tamanhosTelas = {10, 12, 15, 20, 25, 28};
 	
 
-	public long localizarComputador(String _codComp) {	
+	public long localizarComputador(String codigoComputador) {
 		// metodo para localizar um registro no arquivo em disco
 		long posicaoCursorArquivo = 0;
 		try { 
@@ -34,7 +38,7 @@ public class Computador {
 				quantVendida	= arqComp.readInt();
 				dtUltimaVenda	= arqComp.readUTF();
 
-				if ( _codComp.equals(codComp) && ativo == 'S') {
+				if ( codigoComputador.equalsIgnoreCase(codComp) && ativo == 'S') {
 					arqComp.close();
 					return posicaoCursorArquivo;
 				}
@@ -87,42 +91,85 @@ public class Computador {
 
 	// ***********************   INCLUSAO   *****************************
 	public void incluir() {
-		String codigoComputador;
+		String marcaComputador;
 		char confirmacao;
-		long posicaoRegistro;
+		int maiorCodigoNumerico = 0;
+		String codigo = "";
 
 		do {
+			Main.leia.nextLine();
+			System.out.println("\n ***************  INCLUSAO DE COMPUTADORES  ***************** ");
+
 			do {
-				Main.leia.nextLine();
-				System.out.println("\n ***************  INCLUSAO DE ALUNOS  ***************** ");
-				System.out.print("Digite a Matricula do Computador( FIM para encerrar): ");
-				codigoComputador = Main.leia.nextLine();
-				if (codigoComputador.equals("FIM")) {
-					break;
-				}
-				posicaoRegistro = localizarComputador(codigoComputador);
+				System.out.print("Digite a Marca do computador (FIM para encerrar): ");
+				marcaComputador = Main.leia.nextLine();
+				if(marcaComputador.equalsIgnoreCase("FIM")) break;
+				if(!consistirMarca(marcaComputador)) System.out.println("Marca inválida! Opções disponíveis: [Dell, Lenovo, HP, Positivo, Asus, Apple, IBM]");
+			} while(!consistirMarca(marcaComputador));
+			if(marcaComputador.equalsIgnoreCase("FIM")) break;
 
-				if (posicaoRegistro >= 0) {
-					System.out.println("Matricula ja cadastrada, digite outro valor\n");
-				}
-			}while (posicaoRegistro >= 0);
 
-			if (codigoComputador.equals("FIM")) {
+
+			try {
+				RandomAccessFile arqComp = new RandomAccessFile("COMP.DAT", "rw");
+				while (true) {
+					ativo = arqComp.readChar();
+					marca = arqComp.readUTF();
+					codComp = arqComp.readUTF();
+					modelo = arqComp.readUTF();
+					processador = arqComp.readUTF();
+					quantMemoria = arqComp.readInt();
+					tamanhoTela = arqComp.readInt();
+					quantEstoque = arqComp.readInt();
+					preco = arqComp.readFloat();
+					quantVendida = arqComp.readInt();
+					dtUltimaVenda = arqComp.readUTF();
+
+					if (marcaComputador.substring(0, 2).equals(marca.substring(0, 2))
+							&& Integer.parseInt(codComp.substring(2)) > maiorCodigoNumerico && ativo == 'S') {
+						maiorCodigoNumerico = Integer.parseInt(codComp.substring(2));
+					}
+				}
+			} catch (EOFException e) {
+				String maiorCodigoString = String.valueOf(maiorCodigoNumerico + 1);
+				while(maiorCodigoString.length() < 4) {
+					maiorCodigoString = "0" + maiorCodigoString;
+				}
+				codigo = marcaComputador.substring(0, 2).toUpperCase() + maiorCodigoString;
+				System.out.println("codigo gerado: " + codigo);
+				maiorCodigoNumerico = 0;
+			} catch (IOException e) {
+				System.out.println("Erro na abertura do arquivo  -  programa sera finalizado");
+				System.exit(0);
+			}
+
+			if (marcaComputador.equals("FIM")) {
 				break;
 			}
 
 			ativo = 'S';
-			codComp = codigoComputador;
-			System.out.print("Digite a marca do computador...................: ");
-			marca = Main.leia.nextLine();
+			marca = marcaComputador;
+			codComp = codigo;
 			System.out.print("Digite o modelo do computador..................: ");
-			modelo = Main.leia.nextLine();	    	
-			System.out.print("Digite o processador do computador.............: ");
-			processador = Main.leia.nextLine();
-			System.out.print("Digite a quantidade de mem�ria do computador...: ");
+			modelo = Main.leia.nextLine();
+
+			do {
+				System.out.print("Digite o processador do computador.............: ");
+				processador = Main.leia.nextLine();
+				if(!consistirProcessador(processador)) {
+					System.out.println("Processador inválido! Opções disponíveis: Intel Core i3, Intel Core i5, Intel Core i7, Intel Core i9, AMD Ryzen, AMD Athlon");
+				}
+			} while(!consistirProcessador(processador));
+
+			System.out.print("Digite a quantidade de memória do computador...: ");
 			quantMemoria = Main.leia.nextInt();
-			System.out.print("Digite o tamanho da tela.......................: ");
-			tamanhoTela = Main.leia.nextInt();
+
+			do {
+				System.out.print("Digite o tamanho da tela.......................: ");
+				tamanhoTela = Main.leia.nextInt();
+				if(!consitirTamanhoTela(tamanhoTela)) System.out.println("Tamanho invalido. Opções disponíveis: 10, 12, 15, 20, 25, 28");
+			} while(!consitirTamanhoTela(tamanhoTela));
+
 			System.out.print("Digite a quantidade em estoque.................: ");
 			quantEstoque = Main.leia.nextInt();
 			System.out.print("Digite o valor do computador...................: ");
@@ -136,7 +183,7 @@ public class Computador {
 				if (confirmacao == 'S' || confirmacao == 's') {
 					gravarComputador();
 				}
-			}while (confirmacao != 'S' && confirmacao != 'N');
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
 
 		}while ( ! codComp.equals("FIM"));	    
 	}
@@ -152,18 +199,18 @@ public class Computador {
 		do {
 			do {
 				Main.leia.nextLine();
-				System.out.println("\n ***************  ALTERACAO DE Computadores  ***************** ");
-				System.out.print("Digite a Matricula do Computador que deseja alterar( FIM para encerrar ): ");
+				System.out.println("\n ***************  ALTERACAO DE COMPUTADORES  ***************** ");
+				System.out.print("Digite o código do Computador que deseja alterar( FIM para encerrar ): ");
 				codigoComputador = Main.leia.nextLine();
-				if (codigoComputador.equals("FIM")) {
+				if (codigoComputador.equalsIgnoreCase("FIM")) {
 					break;
 				}
 
 				posicaoRegistro = localizarComputador(codigoComputador);
-				if (posicaoRegistro >= 0) {
+				if (posicaoRegistro == -1) {
 					System.out.println("Matricula nao cadastrada no arquivo, digite outro valor\n");
 				}
-			}while (posicaoRegistro >= 0);
+			}while (posicaoRegistro == -1);
 
 			if (codigoComputador.equals("FIM")) {
 				break;
@@ -188,25 +235,36 @@ public class Computador {
 				switch (opcao) {
 				case 1:
 					Main.leia.nextLine();
-					System.out.print  ("Digite a NOVA MARCA do Computador..................: ");
-					marca = Main.leia.nextLine();
+					do {
+						System.out.print("Digite a NOVA MARCA do Computador..................: ");
+						marca = Main.leia.nextLine();
+						if(!consistirMarca(marca)) System.out.println("Marca inválida! Opções disponíveis: [Dell, Lenovo, HP, Positivo, Asus, Apple, IBM]");
+					} while(!consistirMarca(marca));
 					break;
 				case 2: 
 					Main.leia.nextLine();
-					System.out.print  ("Digite o NOVO MODELO do computador.................: ");
+					System.out.print("Digite o NOVO MODELO do computador.................: ");
 					modelo = Main.leia.nextLine();
 					break;
 				case 3:
-					System.out.print  ("Digite o NOVO PROCESSADOR do computador............: ");
-					processador = Main.leia.nextLine();
+					do {
+						System.out.print  ("Digite o NOVO PROCESSADOR do computador............: ");
+						processador = Main.leia.nextLine();
+						if(!consistirProcessador(processador)) {
+							System.out.println("Processador inválido! Opções disponíveis: Intel Core i3, Intel Core i5, Intel Core i7, Intel Core i9, AMD Ryzen, AMD Athlon");
+						}
+					} while(!consistirProcessador(processador));
 					break;
 				case 4: 
 					System.out.print  ("Digite a NOVA quantidade de memoria do Computador..: ");
 					quantMemoria = Main.leia.nextInt();
 					break;
-				case 5: 
-					System.out.print  ("Digite o NOVO tamanho de tela......................: ");
-					tamanhoTela = Main.leia.nextInt();
+				case 5:
+					do {
+						System.out.print  ("Digite o NOVO tamanho de tela......................: ");
+						tamanhoTela = Main.leia.nextInt();
+						if(!consitirTamanhoTela(tamanhoTela)) System.out.println("Tamanho invalido. Opções disponíveis: 10, 12, 15, 20, 25, 28");
+					} while(!consitirTamanhoTela(tamanhoTela));
 					break;
 				case 6: 
 					System.out.print  ("Digite o NOVO preco do Computador..................: ");
@@ -471,5 +529,32 @@ public class Computador {
 			}
 		}
 		return texto;
+	}
+
+	public static boolean consistirMarca(String marcaDigitada) {
+		for(int i = 0; i < marcas.length; i++) {
+			if(marcaDigitada.equalsIgnoreCase(marcas[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean consistirProcessador(String processadorDigitado) {
+		for(int i = 0; i < processadores.length; i++) {
+			if(processadorDigitado.equalsIgnoreCase(processadores[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean consitirTamanhoTela(int tamanhoTelaDigitado) {
+		for(int i = 0; i < tamanhosTelas.length; i++) {
+			if(tamanhoTelaDigitado == tamanhosTelas[i]) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
