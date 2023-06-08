@@ -208,16 +208,15 @@ public class Computador {
 
 				posicaoRegistro = localizarComputador(codigoComputador);
 				if (posicaoRegistro == -1) {
-					System.out.println("Matricula nao cadastrada no arquivo, digite outro valor\n");
+					System.out.println("Código de computador não cadastrado no arquivo, digite outro valor\n");
 				}
 			}while (posicaoRegistro == -1);
 
-			if (codigoComputador.equals("FIM")) {
+			if (codigoComputador.equalsIgnoreCase("FIM")) {
 				break;
 			}
 
 			ativo = 'S';
-
 			do {
 				System.out.println("[ 1 ] Marca do Computador........: " + marca);
 				System.out.println("[ 2 ] Modelo do computador ......: " + modelo);
@@ -284,9 +283,9 @@ public class Computador {
 					gravarComputador();
 					System.out.println("Dados gravados com sucesso !\n");
 				}
-			}while (confirmacao != 'S' && confirmacao != 'N');
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
 
-		}while ( ! codComp.equals("FIM"));
+		}while ( ! codComp.equalsIgnoreCase("FIM"));
 	}
 
 
@@ -299,18 +298,18 @@ public class Computador {
 		do {
 			do {
 				Main.leia.nextLine();
-				System.out.println(" ***************  EXCLUSAO DE COMPUTADORES  ***************** ");
-				System.out.print("Digite a Matricula do Computador que deseja excluir ( FIM para encerrar ): ");
+				System.out.println(" ***************  EXCLUSAO DE COMPUTADOR  ***************** ");
+				System.out.print("Digite o código do Computador que deseja excluir ( FIM para encerrar ): ");
 				codigoComputador = Main.leia.nextLine();
 				if (codigoComputador.equals("FIM")) {
 					break;
 				}
 
 				posicaoRegistro = localizarComputador(codigoComputador);
-				if (posicaoRegistro >= 0) {
-					System.out.println("Matricula nao cadastrada no arquivo, digite outro valor\n");
+				if (posicaoRegistro == -1 ) {
+					System.out.println("Código de computador não cadastrado no arquivo, digite outro valor\n");
 				}
-			}while (posicaoRegistro >= 0);
+			}while (posicaoRegistro == -1);
 
 			if (codigoComputador.equals("FIM")) {
 				System.out.println("\n ************  PROGRAMA ENCERRADO  ************** \n");
@@ -329,12 +328,12 @@ public class Computador {
 			do {
 				System.out.print("\nConfirma a exclusao deste PC? (S/N) ? ");
 				confirmacao = Main.leia.next().charAt(0);
-				if (confirmacao == 'S') {
+				if (confirmacao == 'S' || confirmacao == 's') {
 					desativarComputador(posicaoRegistro);
 				}
-			}while (confirmacao != 'S' && confirmacao != 'N');
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
 
-		}while ( ! codComp.equals("FIM"));
+		}while ( ! codComp.equalsIgnoreCase("FIM"));
 	}
 	
 	//************************  REGISTRAR VENDAS  *********************
@@ -342,45 +341,59 @@ public class Computador {
 	public void registrarVenda() {
 		//Não estava parando na parte da matricula, tive que adicionar esse nextLine() para corrigir esse bug
 		Main.leia.nextLine();
-		
-		String codigo;
-		long posicao = 0;
-		String dataVenda = "---";
-		int vendido;
-		
+
+		String codigoComputador;
+		long posicaoRegistro = 0;
+		String dataVenda = "";
+		int qtdVendida;
+		char confirmacao;
 		
 		do {
-			System.out.print("Digite a Matricula do Computador( FIM para encerrar): ");
-			codigo = Main.leia.nextLine();
-			if (codigo.equals("FIM")) {
+			System.out.print("Digite o código do Computador( FIM para encerrar): ");
+			codigoComputador = Main.leia.nextLine();
+			if (codigoComputador.equalsIgnoreCase("FIM")) {
 				break;
 			}
-			posicao = localizarComputador(codigo);
+			posicaoRegistro = localizarComputador(codigoComputador);
 			
-			if (posicao == -1) {
-				System.out.println("Matricula Não Cadastrada, digite Um Valor válido! \n");
+			if (posicaoRegistro == -1) {
+				System.out.println("Código do computador não cadastrado no arquivo, digite Um Valor válido! \n");
 			}
-		} while(posicao == -1);
+		} while(posicaoRegistro == -1);
+
+		System.out.println("Marca do Computador........: " + marca);
+		System.out.println("Modelo do computador ......: " + modelo);
+		System.out.println("Processador................: " + processador);
+		System.out.println("Quantidade de memoria......: " + quantMemoria);
+		System.out.println("Tamanho da tela............: " + tamanhoTela);
+		System.out.println("Quantidade em estoque......: " + quantEstoque);
+		System.out.println("Preco do computador........: " + preco);
+		System.out.println();
 		
 		System.out.print("Qual a quantidade vendida? ");
-		vendido = Main.leia.nextInt();
+		qtdVendida = Main.leia.nextInt();
 		
 		Main.leia.nextLine();
 		
 		System.out.print("Qual a data da Venda? ");
 		dataVenda = Main.leia.nextLine();
-		
-		desativarComputador(posicao);
-		
-		//ainda precisamos validar essas quantidades e datas
-		quantVendida += vendido;
-		quantEstoque -= quantVendida;
-		dtUltimaVenda = (String) dataVenda;
-		
-		gravarComputador();
-		
-		if(quantEstoque <=0) {
-			desativarComputador(localizarComputador(codigo));
+
+		if(qtdVendida > 0 && qtdVendida <= quantEstoque) {
+			System.out.println("Quantidade vendida: " + qtdVendida);
+			System.out.println("Data da venda: " + dataVenda);
+			do {
+				System.out.print("\nConfirma a venda realizada? (S/N) ? ");
+				confirmacao = Main.leia.next().charAt(0);
+				if (confirmacao == 'S' || confirmacao == 's') {
+					quantVendida += qtdVendida;
+					quantEstoque -= qtdVendida;
+					dtUltimaVenda = dataVenda;
+					desativarComputador(posicaoRegistro);
+					gravarComputador();
+				}
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
+		} else {
+			System.out.println("Operação não foi realizada. Quantidade vendida é inferior a zero ou a quantidade em estoque é inferior a quantidade vendida.");
 		}
 	}
 
