@@ -17,7 +17,9 @@ public class Computador {
 	static String[] marcas =  {"Dell", "Lenovo", "HP", "Positivo", "Asus", "Apple", "IBM"};
 	static String[] processadores = {"Intel Core i3", "Intel Core i5", "Intel Core i7", "Intel Core i9", "AMD Ryzen", "AMD Athlon"};
 	static int[] tamanhosTelas = {10, 12, 15, 20, 25, 28};
-	
+	double vlrTotalVendido;
+	int qtdTotalVendida;
+
 
 	public long localizarComputador(String codigoComputador) {
 		// metodo para localizar um registro no arquivo em disco
@@ -69,7 +71,7 @@ public class Computador {
 			arqComp.writeInt(quantVendida);	
 			arqComp.writeUTF(dtUltimaVenda);	
 			arqComp.close();
-			System.out.println("Dados gravados com sucesso !\n");
+			System.out.println("Dados gravados com sucesso !");
 		}catch (IOException e) { 
 			System.out.println("Erro na abertura do arquivo  -  programa sera finalizado");
 			System.exit(0);
@@ -104,7 +106,7 @@ public class Computador {
 				System.out.print("Digite a Marca do computador (FIM para encerrar): ");
 				marcaComputador = Main.leia.nextLine();
 				if(marcaComputador.equalsIgnoreCase("FIM")) break;
-				if(!consistirMarca(marcaComputador)) System.out.println("Marca inválida! Opções disponíveis: [Dell, Lenovo, HP, Positivo, Asus, Apple, IBM]");
+				if(!consistirMarca(marcaComputador)) System.out.println("Marca invalida! Opcoes disponiveis: [Dell, Lenovo, HP, Positivo, Asus, Apple, IBM]");
 			} while(!consistirMarca(marcaComputador));
 			if(marcaComputador.equalsIgnoreCase("FIM")) break;
 
@@ -125,7 +127,7 @@ public class Computador {
 					quantVendida = arqComp.readInt();
 					dtUltimaVenda = arqComp.readUTF();
 
-					if (marcaComputador.substring(0, 2).equals(marca.substring(0, 2))
+					if (marcaComputador.substring(0, 2).equalsIgnoreCase(marca.substring(0, 2))
 							&& Integer.parseInt(codComp.substring(2)) > maiorCodigoNumerico && ativo == 'S') {
 						maiorCodigoNumerico = Integer.parseInt(codComp.substring(2));
 					}
@@ -150,30 +152,56 @@ public class Computador {
 			ativo = 'S';
 			marca = marcaComputador;
 			codComp = codigo;
-			System.out.print("Digite o modelo do computador..................: ");
-			modelo = Main.leia.nextLine();
+			
+				do {
+					System.out.print("Digite o modelo do computador..................: ");
+					modelo = Main.leia.nextLine();
+					if(modelo.equals("")) {
+						System.out.println("Digitacao obrigatoria para modelo de computador.");
+					}
+				} while(modelo.equals(""));
+				
+				do {
+					System.out.print("Digite o processador do computador.............: ");
+					processador = Main.leia.nextLine();
+					if(!consistirProcessador(processador)) {
+						System.out.println("Processador invalido! Opcoes disponiveis: Intel Core i3, Intel Core i5, Intel Core i7, Intel Core i9, AMD Ryzen, AMD Athlon");
+					}
+				} while(!consistirProcessador(processador));
 
-			do {
-				System.out.print("Digite o processador do computador.............: ");
-				processador = Main.leia.nextLine();
-				if(!consistirProcessador(processador)) {
-					System.out.println("Processador inválido! Opções disponíveis: Intel Core i3, Intel Core i5, Intel Core i7, Intel Core i9, AMD Ryzen, AMD Athlon");
-				}
-			} while(!consistirProcessador(processador));
 
-			System.out.print("Digite a quantidade de memória do computador...: ");
-			quantMemoria = Main.leia.nextInt();
+				do {
+					System.out.print("Digite a quantidade de memoria do computador...: ");
+					quantMemoria = Main.leia.nextInt();
+					if(quantMemoria < 1 || quantMemoria > 16) {
+						System.out.println("Quantidade de memoria do computador deve ser entre 1 e 16 GB");
+					}
+				} while (quantMemoria < 1 || quantMemoria > 16);
 
-			do {
-				System.out.print("Digite o tamanho da tela.......................: ");
-				tamanhoTela = Main.leia.nextInt();
-				if(!consitirTamanhoTela(tamanhoTela)) System.out.println("Tamanho invalido. Opções disponíveis: 10, 12, 15, 20, 25, 28");
-			} while(!consitirTamanhoTela(tamanhoTela));
+				do {
+					System.out.print("Digite o tamanho da tela.......................: ");
+					tamanhoTela = Main.leia.nextInt();
+					if(!consitirTamanhoTela(tamanhoTela)) {
+						System.out.println("Tamanho invalido. Opcoes disponiveis: 10, 12, 15, 20, 25, 28");
+					}
+				} while (!consitirTamanhoTela(tamanhoTela));
+					
+				do {
+					System.out.print("Digite a quantidade em estoque.................: ");
+					quantEstoque = Main.leia.nextInt();
+					if(quantEstoque < 0) {
+						System.out.println("Quantidade em estoque deve ser maior ou igual a zero!");
+					}
+				} while (quantEstoque < 0);
+					
+				do {
+					System.out.print("Digite o valor do computador...................: ");
+					preco = Main.leia.nextFloat();
+					if(preco < 1000 || preco > 20000) {
+						System.out.println("O valor do computador deve ser entre 1000 e 20000 reais");
+					}
+				} while (preco < 1000 || preco > 20000);
 
-			System.out.print("Digite a quantidade em estoque.................: ");
-			quantEstoque = Main.leia.nextInt();
-			System.out.print("Digite o valor do computador...................: ");
-			preco = Main.leia.nextFloat();
 			quantVendida = 0;
 			dtUltimaVenda = "";
 
@@ -200,7 +228,7 @@ public class Computador {
 			do {
 				Main.leia.nextLine();
 				System.out.println("\n ***************  ALTERACAO DE COMPUTADORES  ***************** ");
-				System.out.print("Digite o código do Computador que deseja alterar( FIM para encerrar ): ");
+				System.out.print("Digite o codigo do Computador que deseja alterar( FIM para encerrar ): ");
 				codigoComputador = Main.leia.nextLine();
 				if (codigoComputador.equalsIgnoreCase("FIM")) {
 					break;
@@ -218,58 +246,80 @@ public class Computador {
 
 			ativo = 'S';
 			do {
-				System.out.println("[ 1 ] Marca do Computador........: " + marca);
-				System.out.println("[ 2 ] Modelo do computador ......: " + modelo);
-				System.out.println("[ 3 ] Processador................: " + processador);
-				System.out.println("[ 4 ] Quantidade de memoria......: " + quantMemoria);
-				System.out.println("[ 5 ] Tamanho da tela............: " + tamanhoTela);
+				System.out.println("[ 1 ] Modelo do computador ......: " + modelo);
+				System.out.println("[ 2 ] Processador................: " + processador);
+				System.out.println("[ 3 ] Quantidade de memoria......: " + quantMemoria);
+				System.out.println("[ 4 ] Tamanho da tela............: " + tamanhoTela);
 				System.out.println("[ 5 ] Quantidade em estoque......: " + quantEstoque);
 				System.out.println("[ 6 ] Preco do computador........: " + preco);
 
 				do{
 					System.out.println("Digite o numero do campo que deseja alterar (0 para finalizar as alteracoes): ");
 					opcao = Main.leia.nextByte();
-				}while (opcao < 0 || opcao > 4);
-
-				switch (opcao) {
-				case 1:
-					Main.leia.nextLine();
-					do {
-						System.out.print("Digite a NOVA MARCA do Computador..................: ");
-						marca = Main.leia.nextLine();
-						if(!consistirMarca(marca)) System.out.println("Marca inválida! Opções disponíveis: [Dell, Lenovo, HP, Positivo, Asus, Apple, IBM]");
-					} while(!consistirMarca(marca));
-					break;
-				case 2: 
+				}while (opcao < 0 || opcao > 6);
+				
+			switch (opcao) {
+			case 1:
+				do {
 					Main.leia.nextLine();
 					System.out.print("Digite o NOVO MODELO do computador.................: ");
 					modelo = Main.leia.nextLine();
-					break;
-				case 3:
-					do {
-						System.out.print  ("Digite o NOVO PROCESSADOR do computador............: ");
-						processador = Main.leia.nextLine();
-						if(!consistirProcessador(processador)) {
-							System.out.println("Processador inválido! Opções disponíveis: Intel Core i3, Intel Core i5, Intel Core i7, Intel Core i9, AMD Ryzen, AMD Athlon");
-						}
-					} while(!consistirProcessador(processador));
-					break;
-				case 4: 
+					if(modelo.equals("")) {
+						System.out.println("Digite um valor N�o Nulo!");
+					}
+				} while(modelo.equals(""));
+				break;
+			case 2:
+				Main.leia.nextLine();
+				do {
+					System.out.print  ("Digite o NOVO PROCESSADOR do computador............: ");
+					processador = Main.leia.nextLine();
+					if(!consistirProcessador(processador)) {
+						System.out.println("Processador invalido! Opcoes disponiveis: Intel Core i3, Intel Core i5, Intel Core i7, Intel Core i9, AMD Ryzen, AMD Athlon");
+						break;
+					}
+				} while(!consistirProcessador(processador));
+				
+				break;
+			case 3:
+				do {
 					System.out.print  ("Digite a NOVA quantidade de memoria do Computador..: ");
 					quantMemoria = Main.leia.nextInt();
-					break;
-				case 5:
-					do {
-						System.out.print  ("Digite o NOVO tamanho de tela......................: ");
-						tamanhoTela = Main.leia.nextInt();
-						if(!consitirTamanhoTela(tamanhoTela)) System.out.println("Tamanho invalido. Opções disponíveis: 10, 12, 15, 20, 25, 28");
-					} while(!consitirTamanhoTela(tamanhoTela));
-					break;
-				case 6: 
-					System.out.print  ("Digite o NOVO preco do Computador..................: ");
-					preco = Main.leia.nextFloat();
-					break;
-				}
+					if(quantMemoria < 1 || quantMemoria > 16) {
+						System.out.println("Quantidade de memoria entre 1 e 16 GB");
+					}
+				} while(quantMemoria < 1 || quantMemoria > 16);
+				
+				break;
+			case 4:
+				Main.leia.nextLine();
+				do {
+					System.out.print  ("Digite o NOVO tamanho de tela......................: ");
+					tamanhoTela = Main.leia.nextInt();
+					if(!consitirTamanhoTela(tamanhoTela)) {
+						System.out.println("Tamanho invalido. opcoes disponiveis: 10, 12, 15, 20, 25, 28");
+					}
+				} while(!consitirTamanhoTela(tamanhoTela));
+				
+				break;
+			case 5: 
+				do {
+					System.out.print  ("Digite A nova Quantidade em Estoque do Computador..: ");
+					quantEstoque= Main.leia.nextInt();
+					if(quantEstoque < 0) {
+						System.out.println("Digite uma quantidade maior que 0!");
+					}
+				} while(quantEstoque < 0);
+				break;
+			case 6:
+				do {
+					System.out.print  ("Digite O novo pre�o do Computador..: ");
+					preco= Main.leia.nextInt();
+					if(preco < 1000 || preco > 20000) {
+						System.out.println("Digite uma quantidade maior que 0!");
+					}
+				} while(preco < 1000 || preco > 20000);
+			}
 				quantVendida = 0;
 				dtUltimaVenda = "";
 				System.out.println();
@@ -278,10 +328,9 @@ public class Computador {
 			do {
 				System.out.print("\nConfirma a alteracao dos dados (S/N) ? ");
 				confirmacao = Main.leia.next().charAt(0);
-				if (confirmacao == 'S') {
+				if (confirmacao == 'S' || confirmacao == 's') {
 					desativarComputador(posicaoRegistro);
 					gravarComputador();
-					System.out.println("Dados gravados com sucesso !\n");
 				}
 			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
 
@@ -299,19 +348,19 @@ public class Computador {
 			do {
 				Main.leia.nextLine();
 				System.out.println(" ***************  EXCLUSAO DE COMPUTADOR  ***************** ");
-				System.out.print("Digite o código do Computador que deseja excluir ( FIM para encerrar ): ");
+				System.out.print("Digite o codigo do Computador que deseja excluir ( FIM para encerrar ): ");
 				codigoComputador = Main.leia.nextLine();
-				if (codigoComputador.equals("FIM")) {
+				if (codigoComputador.equalsIgnoreCase("FIM")) {
 					break;
 				}
 
 				posicaoRegistro = localizarComputador(codigoComputador);
 				if (posicaoRegistro == -1 ) {
-					System.out.println("Código de computador não cadastrado no arquivo, digite outro valor\n");
+					System.out.println("Codigo de computador nao cadastrado no arquivo, digite outro valor\n");
 				}
 			}while (posicaoRegistro == -1);
 
-			if (codigoComputador.equals("FIM")) {
+			if (codigoComputador.equalsIgnoreCase("FIM")) {
 				System.out.println("\n ************  PROGRAMA ENCERRADO  ************** \n");
 				break;
 			}
@@ -339,7 +388,7 @@ public class Computador {
 	//************************  REGISTRAR VENDAS  *********************
 	
 	public void registrarVenda() {
-		//Não estava parando na parte da matricula, tive que adicionar esse nextLine() para corrigir esse bug
+		//nao estava parando na parte do codigo, tive que adicionar esse nextLine() para corrigir esse bug
 		Main.leia.nextLine();
 
 		String codigoComputador;
@@ -349,7 +398,7 @@ public class Computador {
 		char confirmacao;
 		
 		do {
-			System.out.print("Digite o código do Computador( FIM para encerrar): ");
+			System.out.print("Digite o codigo do Computador( FIM para encerrar): ");
 			codigoComputador = Main.leia.nextLine();
 			if (codigoComputador.equalsIgnoreCase("FIM")) {
 				break;
@@ -357,7 +406,7 @@ public class Computador {
 			posicaoRegistro = localizarComputador(codigoComputador);
 			
 			if (posicaoRegistro == -1) {
-				System.out.println("Código do computador não cadastrado no arquivo, digite Um Valor válido! \n");
+				System.out.println("Codigo do computador nao cadastrado no arquivo, digite Um Valor valido! \n");
 			}
 		} while(posicaoRegistro == -1);
 
@@ -370,33 +419,34 @@ public class Computador {
 		System.out.println("Preco do computador........: " + preco);
 		System.out.println();
 		
-		System.out.print("Qual a quantidade vendida? ");
-		qtdVendida = Main.leia.nextInt();
+		
+		do{
+			System.out.print("Qual a quantidade vendida? ");
+			qtdVendida = Main.leia.nextInt();
+			if(qtdVendida > quantEstoque) {
+				System.out.println("Quantidade vendida deve ser menor ou igual a quantidade em estoque");
+			}
+		}while(qtdVendida > quantEstoque);
 		
 		Main.leia.nextLine();
 		
 		System.out.print("Qual a data da Venda? ");
 		dataVenda = Main.leia.nextLine();
-
-		if(qtdVendida > 0 && qtdVendida <= quantEstoque) {
-			System.out.println("Quantidade vendida: " + qtdVendida);
-			System.out.println("Data da venda: " + dataVenda);
-			do {
-				System.out.print("\nConfirma a venda realizada? (S/N) ? ");
-				confirmacao = Main.leia.next().charAt(0);
-				if (confirmacao == 'S' || confirmacao == 's') {
-					quantVendida += qtdVendida;
-					quantEstoque -= qtdVendida;
-					dtUltimaVenda = dataVenda;
-					desativarComputador(posicaoRegistro);
-					gravarComputador();
-				}
-			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
-		} else {
-			System.out.println("Operação não foi realizada. Quantidade vendida é inferior a zero ou a quantidade em estoque é inferior a quantidade vendida.");
-		}
+		
+		do {
+			System.out.print("\nConfirma a venda realizada? (S/N) ? ");
+			confirmacao = Main.leia.next().charAt(0);
+			if (confirmacao == 'S' || confirmacao == 's') {
+				quantVendida += qtdVendida;
+				quantEstoque -= qtdVendida;
+				dtUltimaVenda = dataVenda;
+				desativarComputador(posicaoRegistro);
+				gravarComputador();
+			}
+		}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
 	}
-
+	
+	
 	
 	//************************  CONSULTA  *****************************
 	public void consultar() 	{
@@ -406,112 +456,139 @@ public class Computador {
 		long posicaoRegistro;
 
 		do {
+			vlrTotalVendido = 0;
+			qtdTotalVendida = 0;
 			do {
 				System.out.println(" ***************  CONSULTA DE COMPUTADORES  ***************** ");
-				System.out.println(" [1] CONSULTAR APENAS 1 COMPUTADOR ");
-				System.out.println(" [2] LISTA DE TODOS OS COMPUTADORES ");
-				System.out.println(" [3] LISTA DE TODOS OS COMPUTADORES VENDIDOS");
+				System.out.println(" [1] LISTAR TODOS OS COMPUTADORES ");
+				System.out.println(" [2] LISTAR COMPUTADOR POR CODIGO");
+				System.out.println(" [3] LISTAR TODOS OS COMPUTADORES VENDIDOS");
+				System.out.println(" [4] LISTAR COMPUTADORES POR MES E ANO DA ULTIMA VENDA");
+				System.out.println(" [5] LISTAR NOTEBOOKS POR FAIXA DE PRE�O INFORMANDO MINIMO E MAXIMO");
 				System.out.println(" [0] SAIR");
 				System.out.print("\nDigite a opcao desejada: ");
 				opcao = Main.leia.nextByte();
-				if (opcao < 0 || opcao > 2) {
+				if (opcao < 0 || opcao > 5) {
 					System.out.println("opcao Invalida, digite novamente.\n");
 				}
-			}while (opcao < 0 || opcao > 2);
+			}while (opcao < 0 || opcao > 5);
 
 			switch (opcao) {
-			case 0:
-				System.out.println("\n ************  PROGRAMA ENCERRADO  ************** \n");
-				break;
-
-			case 1:  // consulta de uma unica matricula
-				Main.leia.nextLine();  // limpa buffer de memoria
-				System.out.print("Digite a Matricula do Computador: ");
-				codigoComputador = Main.leia.nextLine();
-
-				posicaoRegistro = localizarComputador(codigoComputador);
-				if (posicaoRegistro == -1) {
-					System.out.println("Matricula nao cadastrada no arquivo \n");
-				} else {
-					imprimirCabecalho();
-					imprimirComputador();
-					System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
-					Main.leia.nextLine();
-				}
-
-				break;
-
-			case 2:  // imprime todos os alunos
-				try { 
-					arqComp = new RandomAccessFile("COMP.DAT" , "rw");
-					imprimirCabecalho();
-					while (true) {
-						ativo		 	= arqComp.readChar();
-						marca   		= arqComp.readUTF();
-						codComp   		= arqComp.readUTF();
-						modelo      	= arqComp.readUTF();
-						processador 	= arqComp.readUTF();
-						quantMemoria 	= arqComp.readInt();
-						tamanhoTela		= arqComp.readInt();
-						quantEstoque	= arqComp.readInt();
-						preco			= arqComp.readFloat();
-						quantVendida	= arqComp.readInt();
-						dtUltimaVenda	= arqComp.readUTF();
-						if ( ativo == 'S') {
-							imprimirComputador();
+				case 0:
+					System.out.println("\n ************  PROGRAMA ENCERRADO  ************** \n");
+					break;
+				case 1:  // consulta todos os computadores
+					try {
+						arqComp = new RandomAccessFile("COMP.DAT" , "rw");
+						imprimirCabecalho();
+						while (true) {
+							ativo		 	= arqComp.readChar();
+							marca   		= arqComp.readUTF();
+							codComp   		= arqComp.readUTF();
+							modelo      	= arqComp.readUTF();
+							processador 	= arqComp.readUTF();
+							quantMemoria 	= arqComp.readInt();
+							tamanhoTela		= arqComp.readInt();
+							quantEstoque	= arqComp.readInt();
+							preco			= arqComp.readFloat();
+							quantVendida	= arqComp.readInt();
+							dtUltimaVenda	= arqComp.readUTF();
+							if ( ativo == 'S') {
+								imprimirComputador();
+								somaTotalVendidoEValor();
+							}
 						}
+						//   arqComp.close();
+					} catch (EOFException e) {
+						imprimirTotalVendidoEValor();
+						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+						Main.leia.nextLine();
+					} catch (IOException e) {
+						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
+						System.exit(0);
 					}
-					//    arqAluno.close();
-				} catch (EOFException e) {
-					System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
-					Main.leia.nextLine();
+					break;
+				case 2:  // lista um computador pelo codComp
+					Main.leia.nextLine();  // limpa buffer de memoria
+					System.out.print("Digite o codigo do Computador: ");
 					codigoComputador = Main.leia.nextLine();
-				} catch (IOException e) { 
-					System.out.println("Erro na abertura do arquivo - programa sera finalizado");
-					System.exit(0);
-				}
-				break;
 
-			case 3:  
-				// imprime alunos do sexo desejado
-//				do {
-//					System.out.print("Digite o Sexo desejado (M/F): ");
-//					sexoAux = Main.leia.next().charAt(0);
-//					if (sexoAux != 'F' && sexoAux != 'M') {
-//						System.out.println("Sexo Invalido, digite M ou F");
-//					}
-//				}while (sexoAux != 'F' && sexoAux != 'M');
-
-				try { 
-					arqComp = new RandomAccessFile("COMP.DAT", "rw");
-					imprimirCabecalho();
-					while (true) {
-						ativo		 	= arqComp.readChar();
-						marca   		= arqComp.readUTF();
-						codComp   		= arqComp.readUTF();
-						modelo      	= arqComp.readUTF();
-						processador 	= arqComp.readUTF();
-						quantMemoria 	= arqComp.readInt();
-						tamanhoTela		= arqComp.readInt();
-						quantEstoque	= arqComp.readInt();
-						preco			= arqComp.readFloat();
-						quantVendida	= arqComp.readInt();
-						dtUltimaVenda	= arqComp.readUTF();
-						if ( quantVendida > 0 && ativo == 'S') {
-							imprimirComputador();
+					posicaoRegistro = localizarComputador(codigoComputador);
+					if (posicaoRegistro == -1 || ativo != 'S') {
+						System.out.println("codigo nao cadastrado no arquivo \n");
+					} else {
+						somaTotalVendidoEValor();
+						imprimirCabecalho();
+						imprimirComputador();
+						imprimirTotalVendidoEValor();
+						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+					}
+					break;
+				case 3: // lista computadores j� vendidos
+					try {
+						arqComp = new RandomAccessFile("COMP.DAT", "rw");
+						imprimirCabecalho();
+						while (true) {
+							ativo		 	= arqComp.readChar();
+							marca   		= arqComp.readUTF();
+							codComp   		= arqComp.readUTF();
+							modelo      	= arqComp.readUTF();
+							processador 	= arqComp.readUTF();
+							quantMemoria 	= arqComp.readInt();
+							tamanhoTela		= arqComp.readInt();
+							quantEstoque	= arqComp.readInt();
+							preco			= arqComp.readFloat();
+							quantVendida	= arqComp.readInt();
+							dtUltimaVenda	= arqComp.readUTF();
+							if ( quantVendida > 0 && ativo == 'S') {
+								imprimirComputador();
+								somaTotalVendidoEValor();
+							}
 						}
+					} catch (EOFException e) {
+						imprimirTotalVendidoEValor();
+						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+					} catch (IOException e) {
+						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
+						System.exit(0);
 					}
-				} catch (EOFException e) {
-					System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+					break;
+				case 4:
 					Main.leia.nextLine();
-					codigoComputador = Main.leia.nextLine();
-				} catch (IOException e) { 
-					System.out.println("Erro na abertura do arquivo - programa sera finalizado");
-					System.exit(0);
-				}
-
-			}	
-
+					System.out.print("Digite o mes e o ano desejado (MM/yyyy): ");
+					String dataVenda = Main.leia.nextLine();
+					try {
+						arqComp = new RandomAccessFile("COMP.DAT", "rw");
+						imprimirCabecalho();
+						while (true) {
+							ativo		 	= arqComp.readChar();
+							marca   		= arqComp.readUTF();
+							codComp   		= arqComp.readUTF();
+							modelo      	= arqComp.readUTF();
+							processador 	= arqComp.readUTF();
+							quantMemoria 	= arqComp.readInt();
+							tamanhoTela		= arqComp.readInt();
+							quantEstoque	= arqComp.readInt();
+							preco			= arqComp.readFloat();
+							quantVendida	= arqComp.readInt();
+							dtUltimaVenda	= arqComp.readUTF();
+							if ( !dtUltimaVenda.equals("")) {
+								if(dataVenda.equals(dtUltimaVenda.substring(3)) && ativo == 'S') {
+									imprimirComputador();
+									somaTotalVendidoEValor();
+								}
+							}
+						}
+					} catch (EOFException e) {
+						imprimirTotalVendidoEValor();
+						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+						Main.leia.nextLine();
+					} catch (IOException e) {
+						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
+						System.exit(0);
+					}
+					break;
+			}
 		} while ( opcao != 0 );
 	}
 
@@ -522,14 +599,14 @@ public class Computador {
 	public void imprimirComputador () {
 		System.out.println(	formatarString(marca, 14 ) + "  " +
 				formatarString(codComp , 11) + "  " + 
-				formatarString(modelo , 12) + "  " + 
-				formatarString(processador , 8) + "  " +
+				formatarString(modelo , 10) + "  " + 
+				formatarString(processador ,16) + "  " +
 				formatarString( String.valueOf(quantMemoria) , 13 ) + "  " +
-				formatarString( String.valueOf(tamanhoTela) , 13 ) + "  " +
-				formatarString( String.valueOf(quantEstoque) , 13 ) + "  " +
+				formatarString( String.valueOf(tamanhoTela) , 14 ) + "  " +
+				formatarString( String.valueOf(quantEstoque) , 10 ) + "  " +
 				formatarString( String.valueOf(preco) , 13 ) + "  " +
-				formatarString( String.valueOf(quantVendida) , 13 ) + "  " +
-				formatarString(dtUltimaVenda, 13 )   ); 
+				formatarString( String.valueOf(quantVendida) , 7 ) + "  " +
+				formatarString(dtUltimaVenda, 13 )   );
 	}
 
 	public static String formatarString (String texto, int tamanho) {	
@@ -569,5 +646,18 @@ public class Computador {
 			}
 		}
 		return false;
+	}
+
+	public void somaTotalVendidoEValor() {
+		vlrTotalVendido += (quantVendida * preco);
+		qtdTotalVendida += quantVendida;
+	}
+
+	public void imprimirTotalVendidoEValor() {
+		System.out.println(
+			formatarString("TOTAIS", 100) + " " +
+			formatarString(String.valueOf(vlrTotalVendido), 15) + " " +
+			formatarString(String.valueOf(qtdTotalVendida), 13)
+		);
 	}
 }
