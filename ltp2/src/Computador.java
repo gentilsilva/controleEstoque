@@ -211,7 +211,7 @@ public class Computador {
 				if (confirmacao == 'S' || confirmacao == 's') {
 					gravarComputador();
 				}
-			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N' && confirmacao != 'n');
 
 		}while ( ! codComp.equals("FIM"));	    
 	}
@@ -252,7 +252,8 @@ public class Computador {
 				System.out.println("[ 4 ] Tamanho da tela............: " + tamanhoTela);
 				System.out.println("[ 5 ] Quantidade em estoque......: " + quantEstoque);
 				System.out.println("[ 6 ] Preco do computador........: " + preco);
-
+				System.out.println("[ - ] Quantidade vendida.........: " + quantVendida);
+				System.out.println("[ - ] Data ultima venda..........: " + dtUltimaVenda);
 				do{
 					System.out.println("Digite o numero do campo que deseja alterar (0 para finalizar as alteracoes): ");
 					opcao = Main.leia.nextByte();
@@ -265,7 +266,7 @@ public class Computador {
 					System.out.print("Digite o NOVO MODELO do computador.................: ");
 					modelo = Main.leia.nextLine();
 					if(modelo.equals("")) {
-						System.out.println("Digite um valor Não Nulo!");
+						System.out.println("Digitacao obrigatoria para modelo de computador.");
 					}
 				} while(modelo.equals(""));
 				break;
@@ -304,19 +305,19 @@ public class Computador {
 				break;
 			case 5: 
 				do {
-					System.out.print  ("Digite A nova Quantidade em Estoque do Computador..: ");
+					System.out.print  ("Digite a NOVA Quantidade em Estoque do Computador..: ");
 					quantEstoque= Main.leia.nextInt();
 					if(quantEstoque < 0) {
-						System.out.println("Digite uma quantidade maior que 0!");
+						System.out.println("Quantidade em estoque deve ser maior ou igual a zero!");
 					}
 				} while(quantEstoque < 0);
 				break;
 			case 6:
 				do {
-					System.out.print  ("Digite O novo preço do Computador..: ");
+					System.out.print  ("Digite O NOVO preço do Computador..: ");
 					preco= Main.leia.nextInt();
 					if(preco < 1000 || preco > 20000) {
-						System.out.println("Digite uma quantidade maior que 0!");
+						System.out.println("O valor do computador deve ser entre 1000 e 20000 reais!");
 					}
 				} while(preco < 1000 || preco > 20000);
 			}
@@ -332,7 +333,7 @@ public class Computador {
 					desativarComputador(posicaoRegistro);
 					gravarComputador();
 				}
-			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N' && confirmacao != 'n');
 
 		}while ( ! codComp.equalsIgnoreCase("FIM"));
 	}
@@ -380,7 +381,7 @@ public class Computador {
 				if (confirmacao == 'S' || confirmacao == 's') {
 					desativarComputador(posicaoRegistro);
 				}
-			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
+			}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N' && confirmacao != 'n');
 
 		}while ( ! codComp.equalsIgnoreCase("FIM"));
 	}
@@ -406,7 +407,7 @@ public class Computador {
 			posicaoRegistro = localizarComputador(codigoComputador);
 			
 			if (posicaoRegistro == -1) {
-				System.out.println("Codigo do computador nao cadastrado no arquivo, digite Um Valor valido! \n");
+				System.out.println("Codigo do computador nao cadastrado no arquivo, digite um codigo valido! \n");
 			}
 		} while(posicaoRegistro == -1);
 
@@ -423,10 +424,10 @@ public class Computador {
 		do{
 			System.out.print("Qual a quantidade vendida? ");
 			qtdVendida = Main.leia.nextInt();
-			if(qtdVendida > quantEstoque) {
-				System.out.println("Quantidade vendida deve ser menor ou igual a quantidade em estoque");
+			if(qtdVendida > quantEstoque || qtdVendida <= 0) {
+				System.out.println("Quantidade vendida deve ser menor ou igual a quantidade em estoque e maior que zero");
 			}
-		}while(qtdVendida > quantEstoque);
+		}while(qtdVendida > quantEstoque || qtdVendida <= 0);
 		
 		Main.leia.nextLine();
 		
@@ -443,7 +444,7 @@ public class Computador {
 				desativarComputador(posicaoRegistro);
 				gravarComputador();
 			}
-		}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N');
+		}while (confirmacao != 'S' && confirmacao != 's' && confirmacao != 'N' && confirmacao != 'n');
 	}
 	
 	
