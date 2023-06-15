@@ -464,7 +464,7 @@ public class Computador {
 				System.out.println(" [2] LISTAR COMPUTADOR POR CODIGO");
 				System.out.println(" [3] LISTAR TODOS OS COMPUTADORES VENDIDOS");
 				System.out.println(" [4] LISTAR COMPUTADORES POR MES E ANO DA ULTIMA VENDA");
-				System.out.println(" [5] LISTAR NOTEBOOKS POR FAIXA DE PREÇO INFORMANDO MINIMO E MAXIMO");
+				System.out.println(" [5] LISTAR NOTEBOOKS POR FAIXA DE PREÇO");
 				System.out.println(" [0] SAIR");
 				System.out.print("\nDigite a opcao desejada: ");
 				opcao = Main.leia.nextByte();
@@ -477,7 +477,7 @@ public class Computador {
 				case 0:
 					System.out.println("\n ************  PROGRAMA ENCERRADO  ************** \n");
 					break;
-				case 1:  // consulta todos os computadores
+				case 1:  // Consultar todos os computadores
 					try {
 						arqComp = new RandomAccessFile("COMP.DAT" , "rw");
 						imprimirCabecalho();
@@ -508,14 +508,14 @@ public class Computador {
 						System.exit(0);
 					}
 					break;
-				case 2:  // lista um computador pelo codComp
+				case 2:  // Consultar computador por código de computador
 					Main.leia.nextLine();  // limpa buffer de memoria
 					System.out.print("Digite o codigo do Computador: ");
 					codigoComputador = Main.leia.nextLine();
 
 					posicaoRegistro = localizarComputador(codigoComputador);
 					if (posicaoRegistro == -1 || ativo != 'S') {
-						System.out.println("codigo nao cadastrado no arquivo \n");
+						System.out.println("Codigo nao cadastrado no arquivo \n");
 					} else {
 						somaTotalVendidoEValor();
 						imprimirCabecalho();
@@ -524,7 +524,7 @@ public class Computador {
 						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
 					}
 					break;
-				case 3: // lista computadores já vendidos
+				case 3: // Consultar todos os computadores que tiveram vendas
 					try {
 						arqComp = new RandomAccessFile("COMP.DAT", "rw");
 						imprimirCabecalho();
@@ -553,7 +553,7 @@ public class Computador {
 						System.exit(0);
 					}
 					break;
-				case 4:
+				case 4:		// Consultar computadores por data de venda
 					Main.leia.nextLine();
 					System.out.print("Digite o mes e o ano desejado (MM/yyyy): ");
 					String dataVenda = Main.leia.nextLine();
@@ -588,6 +588,42 @@ public class Computador {
 						System.exit(0);
 					}
 					break;
+				case 5:
+					Main.leia.nextLine();
+					System.out.print("Digite o valor minimo: ");
+					float valorMinimo = Float.parseFloat(Main.leia.nextLine());
+					System.out.print("Digite o valor maximo: ");
+					float valorMaximo = Float.parseFloat(Main.leia.nextLine());
+					try {
+						arqComp = new RandomAccessFile("COMP.DAT", "rw");
+						imprimirCabecalho();
+						while (true) {
+							ativo		 	= arqComp.readChar();
+							marca   		= arqComp.readUTF();
+							codComp   		= arqComp.readUTF();
+							modelo      	= arqComp.readUTF();
+							processador 	= arqComp.readUTF();
+							quantMemoria 	= arqComp.readInt();
+							tamanhoTela		= arqComp.readInt();
+							quantEstoque	= arqComp.readInt();
+							preco			= arqComp.readFloat();
+							quantVendida	= arqComp.readInt();
+							dtUltimaVenda	= arqComp.readUTF();
+							if(modelo.equalsIgnoreCase("Notebook") && ativo == 'S') {
+								if(preco >= valorMinimo && preco <= valorMaximo) {
+									imprimirComputador();
+									somaTotalVendidoEValor();
+								}
+							}
+						}
+					} catch (EOFException e) {
+						imprimirTotalVendidoEValor();
+						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+						Main.leia.nextLine();
+					} catch (IOException e) {
+						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
+						System.exit(0);
+					}
 			}
 		} while ( opcao != 0 );
 	}
@@ -654,6 +690,7 @@ public class Computador {
 	}
 
 	public void imprimirTotalVendidoEValor() {
+		System.out.println();
 		System.out.println(
 			formatarString("TOTAIS", 100) + " " +
 			formatarString(String.valueOf(vlrTotalVendido), 15) + " " +
