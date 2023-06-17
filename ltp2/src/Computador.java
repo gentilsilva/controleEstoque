@@ -236,7 +236,7 @@ public class Computador {
 
 				posicaoRegistro = localizarComputador(codigoComputador);
 				if (posicaoRegistro == -1) {
-					System.out.println("CÃ³digo de computador nÃ£o cadastrado no arquivo, digite outro valor\n");
+					System.out.println("Codigo de computador nao cadastrado no arquivo, digite outro valor\n");
 				}
 			}while (posicaoRegistro == -1);
 
@@ -246,7 +246,8 @@ public class Computador {
 
 			ativo = 'S';
 			do {
-				System.out.println("[ 1 ] Modelo do computador ......: " + modelo);
+				System.out.println("[ 1 ] Modelo do computador.......: " + modelo);
+				System.out.println("[ - ] Codigo do computador.......:" + codComp);
 				System.out.println("[ 2 ] Processador................: " + processador);
 				System.out.println("[ 3 ] Quantidade de memoria......: " + quantMemoria);
 				System.out.println("[ 4 ] Tamanho da tela............: " + tamanhoTela);
@@ -430,9 +431,13 @@ public class Computador {
 		}while(qtdVendida > quantEstoque || qtdVendida <= 0);
 		
 		Main.leia.nextLine();
+
+		do {
+			System.out.print("Qual a data da Venda? ");
+			dataVenda = Main.leia.nextLine();
+		} while(!consistirData(dataVenda));
 		
-		System.out.print("Qual a data da Venda? ");
-		dataVenda = Main.leia.nextLine();
+
 		
 		do {
 			System.out.print("\nConfirma a venda realizada? (S/N) ? ");
@@ -465,7 +470,7 @@ public class Computador {
 				System.out.println(" [2] LISTAR COMPUTADOR POR CODIGO");
 				System.out.println(" [3] LISTAR TODOS OS COMPUTADORES VENDIDOS");
 				System.out.println(" [4] LISTAR COMPUTADORES POR MES E ANO DA ULTIMA VENDA");
-				System.out.println(" [5] LISTAR NOTEBOOKS POR FAIXA DE PREÇO");
+				System.out.println(" [5] LISTAR COMPUTADORES POR FAIXA DE PREÇO");
 				System.out.println(" [0] SAIR");
 				System.out.print("\nDigite a opcao desejada: ");
 				opcao = Main.leia.nextByte();
@@ -496,7 +501,8 @@ public class Computador {
 							dtUltimaVenda	= arqComp.readUTF();
 							if ( ativo == 'S') {
 								imprimirComputador();
-								somaTotalVendidoEValor();
+								qtdTotalVendida += quantVendida;
+								vlrTotalVendido += calcularValorTotal(quantVendida, preco);
 							}
 						}
 						//   arqComp.close();
@@ -508,6 +514,7 @@ public class Computador {
 						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
 						System.exit(0);
 					}
+					Main.leia.nextLine();
 					break;
 				case 2:  // Consultar computador por código de computador
 					Main.leia.nextLine();  // limpa buffer de memoria
@@ -518,12 +525,12 @@ public class Computador {
 					if (posicaoRegistro == -1 || ativo != 'S') {
 						System.out.println("Codigo nao cadastrado no arquivo \n");
 					} else {
-						somaTotalVendidoEValor();
 						imprimirCabecalho();
 						imprimirComputador();
 						imprimirTotalVendidoEValor();
 						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
 					}
+					Main.leia.nextLine();
 					break;
 				case 3: // Consultar todos os computadores que tiveram vendas
 					try {
@@ -543,16 +550,19 @@ public class Computador {
 							dtUltimaVenda	= arqComp.readUTF();
 							if ( quantVendida > 0 && ativo == 'S') {
 								imprimirComputador();
-								somaTotalVendidoEValor();
+								qtdTotalVendida += quantVendida;
+								vlrTotalVendido += calcularValorTotal(quantVendida, preco);
 							}
 						}
 					} catch (EOFException e) {
 						imprimirTotalVendidoEValor();
 						System.out.println("\n FIM DE RELATORIO - ENTER para continuar...\n");
+						Main.leia.nextLine();
 					} catch (IOException e) {
 						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
 						System.exit(0);
 					}
+					Main.leia.nextLine();
 					break;
 				case 4:		// Consultar computadores por data de venda
 					Main.leia.nextLine();
@@ -573,11 +583,10 @@ public class Computador {
 							preco			= arqComp.readFloat();
 							quantVendida	= arqComp.readInt();
 							dtUltimaVenda	= arqComp.readUTF();
-							if ( !dtUltimaVenda.equals("")) {
-								if(dataVenda.equals(dtUltimaVenda.substring(3)) && ativo == 'S') {
-									imprimirComputador();
-									somaTotalVendidoEValor();
-								}
+							if(!dtUltimaVenda.equals("") && dataVenda.equals(dtUltimaVenda.substring(3)) && ativo == 'S') {
+								imprimirComputador();
+								qtdTotalVendida += quantVendida;
+								vlrTotalVendido += calcularValorTotal(quantVendida, preco);
 							}
 						}
 					} catch (EOFException e) {
@@ -588,9 +597,9 @@ public class Computador {
 						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
 						System.exit(0);
 					}
+					Main.leia.nextLine();
 					break;
 				case 5:
-					Main.leia.nextLine();
 					System.out.print("Digite o valor minimo: ");
 					float valorMinimo = Float.parseFloat(Main.leia.nextLine());
 					System.out.print("Digite o valor maximo: ");
@@ -610,11 +619,10 @@ public class Computador {
 							preco			= arqComp.readFloat();
 							quantVendida	= arqComp.readInt();
 							dtUltimaVenda	= arqComp.readUTF();
-							if(modelo.equalsIgnoreCase("Notebook") && ativo == 'S') {
-								if(preco >= valorMinimo && preco <= valorMaximo) {
-									imprimirComputador();
-									somaTotalVendidoEValor();
-								}
+							if(preco >= valorMinimo && preco <= valorMaximo && ativo == 'S') {
+								imprimirComputador();
+								qtdTotalVendida += quantVendida;
+								vlrTotalVendido += calcularValorTotal(quantVendida, preco);
 							}
 						}
 					} catch (EOFException e) {
@@ -625,12 +633,14 @@ public class Computador {
 						System.out.println("Erro na abertura do arquivo - programa sera finalizado");
 						System.exit(0);
 					}
+					Main.leia.nextLine();
+					break;
 			}
 		} while ( opcao != 0 );
 	}
 
 	public void imprimirCabecalho () {
-		System.out.println("---MARCA---  ---CODIGO---  --MODELO--  -PROCESSADOR-  -QTD MEMORIA- -TAMANHO TELA-  --QTD ESTOQUE-- --PRECO-- -QTD VENDIDA- -ULTIMA VENDA-");
+		System.out.println("---MARCA---  ---CODIGO---  --MODELO--  -PROCESSADOR-  -QTD MEMORIA- -TAMANHO TELA-  --QTD ESTOQUE-- --PRECO-- -QTD VENDIDA- -ULTIMA VENDA- -VLR TOTAL-");
 	}
 
 	public void imprimirComputador () {
@@ -643,7 +653,8 @@ public class Computador {
 				formatarString( String.valueOf(quantEstoque) , 10 ) + "  " +
 				formatarString( String.valueOf(preco) , 13 ) + "  " +
 				formatarString( String.valueOf(quantVendida) , 7 ) + "  " +
-				formatarString(dtUltimaVenda, 13 )   );
+				formatarString(dtUltimaVenda, 13) + " " +
+				formatarString( String.valueOf(calcularValorTotal(quantVendida, preco)), 5));
 	}
 
 	public static String formatarString (String texto, int tamanho) {	
@@ -685,17 +696,72 @@ public class Computador {
 		return false;
 	}
 
-	public void somaTotalVendidoEValor() {
-		vlrTotalVendido += (quantVendida * preco);
-		qtdTotalVendida += quantVendida;
-	}
-
 	public void imprimirTotalVendidoEValor() {
 		System.out.println();
 		System.out.println(
-			formatarString("TOTAIS", 100) + " " +
-			formatarString(String.valueOf(vlrTotalVendido), 15) + " " +
-			formatarString(String.valueOf(qtdTotalVendida), 13)
+			formatarString("TOTAIS", 116) + " " +
+			formatarString(String.valueOf(qtdTotalVendida), 22) + " " +
+			formatarString(String.valueOf(vlrTotalVendido), 13)
 		);
+	}
+	
+	public float calcularValorTotal(int qtdVendida, float valor) {
+		return qtdVendida * valor;
+	}
+
+	public boolean consistirData(String data) {
+		int dia;
+		int mes;
+		int ano;
+
+		if(data.length() != 10) {
+			System.out.println("Data invalida, deve possuir 10 caracteres. Ex: (DD/MM/AAAA).");
+			return false;
+		}
+
+		if(data.charAt(2) != '/' || data.charAt(5) != '/') {
+			System.out.println("Formato invalido. Data valida no formato (DD/MM/AAAA).");
+			return false;
+		}
+
+		try {
+			dia = Integer.parseInt(data.substring(0, 2));
+			mes = Integer.parseInt(data.substring(3, 5));
+			ano = Integer.parseInt(data.substring(6));
+		} catch (NumberFormatException exception) {
+			System.out.println("Data invalida, data, mes e ano devem ser numericos.");
+			return false;
+		}
+
+		if(mes < 1 || mes > 12) {
+			System.out.println("O mes deve estar entre 1 e 12");
+			return false;
+		}
+
+		if(mes == 4 || mes == 6 || mes == 9 || mes == 11) {
+			if(dia < 1 || dia > 30) {
+				System.out.println("Os meses de (Abril, Junho, setembro e Novembro devem ter de 1 a 30 dias.");
+				return false;
+			}
+		} else if(mes == 2) {
+			if((ano % 4 == 0 && ano % 100 == 0 && ano % 400 == 0) || (ano % 4 == 0 && ano % 100 != 0)) {
+				if(dia < 1 || dia > 29) {
+					System.out.println("Em ano bissexto o mes de Fevereiro possui de 1 a 29 dias.");
+					return false;
+				}
+			} else {
+				if(dia < 1 || dia > 28) {
+					System.out.println("Em ano nao bissexto o mes de Fevereiro possui de 1 a 28 dias.");
+					return false;
+				}
+			}
+		} else {
+			if(dia < 1 || dia > 31) {
+				System.out.println("Os meses de (Janeiro, Marco, Maio, Julho, Agosto, Outubro e Dezembro " +
+						"devem ter de 1 a 31 dias.");
+				return false;
+			}
+		}
+		return true;
 	}
 }
